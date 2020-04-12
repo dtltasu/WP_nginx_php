@@ -1,0 +1,84 @@
+version: '3'
+
+services:
+    nginx:
+        build: ./nginx
+        container_name: nginx_wp
+        ports:
+            - '8080:80'
+        expose:
+            - '80'
+        volumes:
+            - ./wordpress:/opt/app/public
+            - ./logs:/var/log/nginx
+#            - ./www/wp:/var/www/wp
+        depends_on:
+            - php
+        networks:
+            - wp-network 
+        restart: always
+
+    mysql:
+        image: mariadb
+        container_name: mysql_wp
+        ports:
+            - '3306:3306'
+        volumes:
+            - ./db-data:/var/lib/mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=123
+            - MYSQL_DATABASE=wpdb
+            - MYSQL_USER=dtltasu
+            - MYSQL_PASSWORD=123
+        networks:
+            - wp-network 
+        restart: always
+
+    php:
+        build: ./php
+        container_name: php_wp
+        ports: 
+            - '9000:9000'
+        expose:
+            - '9000'
+        volumes:
+            - ./wordpress:/opt/app/public
+        environment:
+            - WORDPRESS_DB_NAME=wpdb
+            - WORDPRESS_TABLE_PREFIX=wp_
+            - WORDPRESS_DB_HOST=mysql
+            - WORDPRESS_DB_USER=dtltasu
+            - WORDPRESS_DB_PASSWORD=123
+        links:
+            - mysql
+        networks:
+            - wp-network 
+        restart: unless-stopped
+   
+    wordpress:
+        depends_on:
+            - mysql
+        image: wordpress:latest
+        container_name: wp
+#        ports:
+#            - '9000:9000'
+        volumes:
+            - ./wordpress:/var/www/html
+        environment:
+            - WORDPRESS_DB_NAME=wpdb
+            - WORDPRESS_TABLE_PREFIX=wp_
+            - WORDPRESS_DB_HOST=mysql
+            - WORDPRESS_DB_USER=dtltasu
+            - WORDPRESS_DB_PASSWORD=123
+        links:
+            - mysql
+        networks:
+            - wp-network
+        restart: always
+volumes:
+    db_data:
+    wordpress:
+
+networks:
+    wp-network:
+        driver: bridge
