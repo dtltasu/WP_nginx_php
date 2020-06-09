@@ -1,11 +1,12 @@
 FROM centos:8
 
 RUN \
-#  add-apt-repository -y ppa:nginx/stable && \
   dnf update -y && \
   dnf -y install nginx && \
   dnf clean all
 RUN rm -rf /var/lib/apt/lists/* 
+
+RUN mkdir /etc/test
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY app.conf /etc/nginx/conf.d/app.conf
