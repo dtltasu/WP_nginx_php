@@ -1,3 +1,8 @@
-Django==1.6
+Django==1.4
 Flask==0.10
 requests==2.19.0
+
+
+password=234234534564575647
+API_KEY=sdfdsfgdhgfghjghkgjkjfghg
+VISA=490456233
