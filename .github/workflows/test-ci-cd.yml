@@ -73,7 +73,7 @@ jobs:
           client_id: rfwribqyt
           api_key: NGM2NDcxZWMtZTJlNi00OGJmLWE0YjctODA1MzNiM2I5NjQ4
           project_name: "SOOS-DAST-Scan"
-          target_url: "https://master-gusa-desktop.gusadev.com.com"
+          target_url: "https://master-gusa-desktop.gusadev.com"
 
 
   deployment:
