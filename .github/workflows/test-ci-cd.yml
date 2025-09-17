@@ -1,6 +1,7 @@
 name: Deploy Production
 
 on:
+  push:
   workflow_dispatch:
       inputs:
         beta:
@@ -26,48 +27,60 @@ on:
 
 jobs:
 
-  set-analytics:
-    runs-on: ubuntu
-    outputs:
-        analytics: ${{ steps.step1.outputs.analytics }}
-    steps:
-      - id: step1
-        run: |
-          echo "{
-            \"beta\": ${{ toJson(github.event.inputs.beta) }},
-            \"origin\": ${{ toJson(github.event.inputs.origin) }},
-            \"alpha\": ${{ toJson(github.event.inputs.alpha) }},
-            \"production\": ${{ toJson(github.event.inputs.production) }}
-          }" > output.json
-          echo "analytics=$( jq -c 'map_values(. // empty) | keys' output.json)" >> $GITHUB_OUTPUT
+#  set-analytics:
+#    runs-on: ubuntu
+#    outputs:
+#        analytics: ${{ steps.step1.outputs.analytics }}
+#    steps:
+#      - id: step1
+#        run: |
+#          echo "{
+#            \"beta\": ${{ toJson(github.event.inputs.beta) }},
+#            \"origin\": ${{ toJson(github.event.inputs.origin) }},
+#            \"alpha\": ${{ toJson(github.event.inputs.alpha) }},
+#            \"production\": ${{ toJson(github.event.inputs.production) }}
+#          }" > output.json
+#          echo "analytics=$( jq -c 'map_values(. // empty) | keys' output.json)" >> $GITHUB_OUTPUT
+#
+#  check-build:
+#    runs-on: ubuntu
+#    steps:
+#        - name: Echo
+#          run: |
+#            echo ${{ toJson(github.event.inputs.production) }}
+#            echo ${{ toJson(github) }}
+#
+#
+#  build:
+#    runs-on: ubuntu
+#    if: failure()
+#    needs: check-build
+#    name: build-${{ matrix.app-env }}
+#    strategy:
+#      matrix:
+#        app-env: ['staging', 'production']
+#    steps:
+#        - name: TEst
+#          run: echo "Build RUN ${{ matrix.app-env }}"
 
-  check-build:
-    runs-on: ubuntu
+  soos_dast_scan:
+    name: SOOS DAST Scan
+    runs-on: ubuntu-latest
     steps:
-        - name: Echo
-          run: |
-            echo ${{ toJson(github.event.inputs.production) }}
-            echo ${{ toJson(github) }}
-
-
-  build:
-    runs-on: ubuntu
-    if: failure()
-    needs: check-build
-    name: build-${{ matrix.app-env }}
-    strategy:
-      matrix:
-        app-env: ['staging', 'production']
-    steps:
-        - name: TEst
-          run: echo "Build RUN ${{ matrix.app-env }}"
+      - name: Run SOOS DAST Scan
+        uses: soos-io/soos-dast-github-action@v2
+        with:
+          client_id: rfwribqyt
+          api_key: NGM2NDcxZWMtZTJlNi00OGJmLWE0YjctODA1MzNiM2I5NjQ4
+          project_name: "SOOS-DAST-Scan"
+          target_url: "https://master-gusa-desktop.gusadev.com.com"
 
 
   deployment:
     runs-on: ubuntu
     name: deploy-${{ matrix.analytics }}
     if: ${{ needs.build.result == 'skipped' || needs.build.result == 'success' || needs.build.result == null }}
-    needs: [ set-analytics, build ]
+    needs: [ soos_dast_scan ]
     strategy:
         matrix:
            analytics: ${{ fromJSON(needs.set-analytics.outputs.analytics) }}
