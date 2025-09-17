@@ -62,6 +62,17 @@ jobs:
 #    steps:
 #        - name: TEst
 #          run: echo "Build RUN ${{ matrix.app-env }}"
+  soos_sast_scan:
+    name: SOOS SAST Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Run SOOS SAST Scan
+        uses: soos-io/soos-sast-github-action@v1
+        with:
+          client_id: rfwribqyt
+          api_key: NGM2NDcxZWMtZTJlNi00OGJmLWE0YjctODA1MzNiM2I5NjQ4
+          project_name: ${{ github.repository }}
 
   soos_dast_scan:
     name: SOOS DAST Scan
