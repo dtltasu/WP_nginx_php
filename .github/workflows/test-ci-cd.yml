@@ -27,6 +27,32 @@ on:
 
 jobs:
 
+  ai-sast:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run AI SAST
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ASSISTANT_ID: ${{ secrets.OPENAI_ASSISTANT_ID }}
+          OPENAI_FILE_IDS: ${{ secrets.OPENAI_FILE_IDS }}
+          DEBUG: true
+        run: |
+          python app.py
+
 #  set-analytics:
 #    runs-on: ubuntu
 #    outputs:
