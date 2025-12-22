@@ -51,7 +51,7 @@ jobs:
           OPENAI_FILE_IDS: ${{ secrets.OPENAI_FILE_IDS }}
           DEBUG: true
         run: |
-          python app.py
+          python function.py
 
 #  set-analytics:
 #    runs-on: ubuntu
